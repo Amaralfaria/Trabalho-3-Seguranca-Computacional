@@ -1,41 +1,9 @@
 import random as rd
 import math
-"""
-def getM(number):
-    if number%2 == 1:
-        return -1
-    
-    exponent = 1
-    m = 0
-    
-    while number%(2**exponent) == 0:
-        exponent+=1
-    
-    exponent-=1
-    m = int(number/(2**exponent))
-
-    return m
-
-def millerRabin(candidate):
-    previousNumber = candidate - 1
-    m = getM(previousNumber)
-
-    a = rd.randint(2,previousNumber-1)
-   
-     
-    bi = (a**m)%candidate
-    
-
-    while bi not in (1,-1):
-        bi = (bi**2)%candidate
-
-    if bi == -1:
-        return True
-    return False
-"""
 
 
-def millerRabin(n, k=5):
+
+def millerRabin(n, number_of_rounds=40):
     if n <= 1:
         return False
     if n == 2 or n == 3:
@@ -48,7 +16,7 @@ def millerRabin(n, k=5):
         r += 1
         d //= 2
 
-    for _ in range(k):
+    for _ in range(number_of_rounds):
         a = rd.randint(2, n - 2)
         x = pow(a, d, n)
         if x == 1 or x == n - 1:
@@ -80,7 +48,6 @@ def rsaKeys(prime1, prime2):
     public_key = ()
     private_key = ()
     e = 0
-    d = 0
 
     for i in range(2,n_coprime):
         if areCoprime(i,prime_product) and areCoprime(i,n_coprime):
@@ -88,11 +55,6 @@ def rsaKeys(prime1, prime2):
             break
     
     mod_number = pow(e, -1, n_coprime)
-
-    # print(mod_number, e, n_coprime)
-    # print('resto')
-    # print((e*mod_number)%n_coprime)
-
     public_key = (e,prime_product)
     private_key = (mod_number, prime_product)
 
@@ -110,34 +72,27 @@ def stringToNumber(s):
 
 
 
-n_bits = 1024
-p1 = generatePrime(n_bits)
-p2 = generatePrime(n_bits)
-# p1 = 53
-# p2 = 41
-
-msg = 'ola mundo'
-number = stringToNumber(msg)
-print(number)
-# print(p1)
-# print()
-# print(p2)
-
-public_key, private_key = rsaKeys(p1,p2)
-ciphered = rsaOperation(number,public_key)
-deciphered = rsaOperation(ciphered,private_key)
 
 
-print(ciphered)
-print()
-print(deciphered)
+if __name__ == "__main__":
+    n_bits = 1024
+    p1 = generatePrime(n_bits)
+    p2 = generatePrime(n_bits)
+    print(f"Length of the primes generated: {len(str(p1))}, {len(str(p2))}\n")
+
+    plaintext = "Localização do tesouro nas coordenadas X E Y"
+    print(f"Plaintext:\n {plaintext}")
+    number = stringToNumber(plaintext)
+    print(f"Message in number format:\n{number}")
+
+    public_key, private_key = rsaKeys(p1,p2)
+    cipher = rsaOperation(number,public_key)
+    decipher = rsaOperation(cipher,private_key)
 
 
-# print(mod_number, e, n_coprime)
-
-# for i in range(20):
-#     print('numero:', 11*i, 'resto por 24:',(11*i)%24)
-
+    print(f"Text ciphered: \n{cipher}")
+    print()
+    print(f"Text deciphered:\n {decipher}")
 
 
 
