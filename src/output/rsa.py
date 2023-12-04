@@ -1,6 +1,7 @@
 import random as rd
 import math
-
+from hashlib import sha3_512
+from base64 import b64encode
 
 
 def millerRabin(n, number_of_rounds=40):
@@ -71,6 +72,33 @@ def stringToNumber(s):
     return int(number)
 
 
+def sign_message(mensagem, private_key):
+    
+    #Mensagem/informacao para ser assinada
+    
+    mensagem = b64encode(mensagem.encode())
+
+    #Hash da mensagem de 512bits para caber na assinatura de 1024bits
+    
+    hash = int.from_bytes(sha3_512(mensagem).digest(), byteorder='big')
+
+    #Assinatura com a chave privada
+    
+    assinatura = pow(hash, private_key[0], private_key[1])
+
+    return (hash, assinatura)
+
+def verify_signature(hash, assinatura, public_key):
+    
+    #Retorno da assinatura para o hash da mensagem original para posterior comparacao e validacao da assinatura
+    
+    hash_assinatura = pow(assinatura, public_key[0], public_key[1])
+
+    if hash == hash_assinatura:
+        return True
+    return False
+
+
 
 
 
@@ -81,18 +109,33 @@ if __name__ == "__main__":
     print(f"Length of the primes generated: {len(str(p1))}, {len(str(p2))}\n")
 
     plaintext = "Localização do tesouro nas coordenadas X E Y"
-    print(f"Plaintext:\n {plaintext}")
-    number = stringToNumber(plaintext)
-    print(f"Message in number format:\n{number}")
+    # print(f"Plaintext:\n {plaintext}")
+    # number = stringToNumber(plaintext)
+    # print(f"Message in number format:\n{number}")
 
     public_key, private_key = rsaKeys(p1,p2)
-    cipher = rsaOperation(number,public_key)
-    decipher = rsaOperation(cipher,private_key)
+    # print("public key", public_key)
+    # print("private key", private_key)
+    # cipher = rsaOperation(number,public_key)
+    # decipher = rsaOperation(cipher,private_key)
 
 
-    print(f"Text ciphered: \n{cipher}")
-    print()
-    print(f"Text deciphered:\n {decipher}")
+    # print(f"Text ciphered: \n{cipher}")
+    # print()
+    # print(f"Text deciphered:\n {decipher}")
+
+
+    #Mensagem para assinar, teste para verificar funcionamento da lógica 
+    
+
+    #Assinar mensagem gerando o hash e a assinatura
+    
+    (hash, assinatura) = sign_message(plaintext, private_key)
+
+    print("Mensagem para assinar: {}\n".format(plaintext))
+    print("Hash da mensagem: {}\n".format(hex(hash)))
+    print("Assinatura: {}\n".format(hex(assinatura)))
+    print("Validade da assinatura: {}".format(verify_signature(hash, assinatura, public_key)))
 
 
 
